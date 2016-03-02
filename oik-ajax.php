@@ -43,10 +43,15 @@ oik_ajax_loaded();
  */
 function oik_ajax_loaded() {
 	add_filter( "oik_shortcode_result", "oika_oik_shortcode_result", 11, 4 );
+	add_action( "wp_ajax_oik-ajax-do-shortcode", "oika_oik_ajax_do_shortcode" );
+	add_action( "wp_ajax_nopriv_oik-ajax-do-shortcode", "oika_oik_ajax_do_shortcode" );
 }
 
 /**
  * Implement "oik_shortcode_result" for oik-ajax
+ *
+ * @TODO This function only intercepts the results of shortcodes which produce paginated output
+ * We need something else to handle other ways that paginated output is produced.
  * 
  * @param string $result - the output of the shortcode
  * @param array $atts - the shortcode parameters
@@ -73,17 +78,31 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  *
  */
 function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
-	oika_enqueue_jquery();
-	sdiv( "ajax-shortcode" );
-	$flat_atts = oika_flatten_atts( $atts );
-	e( "[$tag$flat_atts]" );
-	$current_post = oika_current_post();
-	e( $current_post ); 
-	e( $result );
+	$bwscid = bw_array_get( $atts, 'bwscid', null );    
+	$paged = bw_array_get( $atts, "paged", null );
+	if ( $bwscid ) {
+		oika_enqueue_jquery();
+		$ajaxurl = admin_url( "admin-ajax.php" );
+		unset( $atts['paged'] );
+		$flat_atts = oika_flatten_atts( $atts );
+		$kvs = kv( "data-url", "$ajaxurl" );
+		$kvs .= kv( "data-shortcode", "$tag$flat_atts" ); 
+		$kvs .= kv( "data-action", "oik-ajax-do-shortcode" );
+		$kvs .= kv( "data-post", oika_current_post() );
+		$kvs .= kv( "data-bwscid", $bwscid );
+		$kvs .= kv( "data-paged", $paged );
+		sdiv( "ajax-shortcode", null, $kvs);
+		//e( "[$tag$flat_atts]" );
+		//e( $current_post ); 
+		e( $result );
 	
-	ediv();
+		ediv();
 	
-	$ajax_shortcode = bw_ret();
+		$ajax_shortcode = bw_ret() ;
+	} else {	
+		$ajax_shortcode = $result;
+	} 
+	
 	return( $ajax_shortcode );
 }
 
@@ -91,19 +110,26 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 /**
  * Flatten the atts parameter back into shortcode parameters
  *
+ * We can't use json_encode since it baulks on objects in the array
+ * so let's just do outr own thing
  */
 function oika_flatten_atts( $atts ) {
 	bw_trace2();
-	$flat_atts = null;
+	$flat_atts = "";
 	if ( is_array( $atts) && count( $atts ) ) {
 		foreach ( $atts as $key => $value ) {
 			if ( is_object( $value ) ) {
 				// WP_Query contains some interesting stuff - do we need it?
 			} else {
-				$flat_atts .= " $key=$value";
+				$flat_atts .= kv( $key, $value );
 			}
 		}
 	}	
+  // $flat_atts .= "atts_count=" .count( $atts );
+	
+	// Do we need to urlencode this, or convert " to ' or something?
+	
+	$flat_atts = urlencode( $flat_atts );
 	return( $flat_atts );
 }
 
@@ -128,6 +154,8 @@ function oika_current_post() {
 
 /**
  * Enqueue the jQuery to hook into the pagination links
+ *
+ * Should we also call wp_localize_script to set the admin URL only once?
  *
  */
 function oika_enqueue_jquery() {
@@ -175,4 +203,71 @@ function oika_enqueue_jquery() {
 <a class="next page-numbers" href="/wporg/oik_shortcodes/bw_navi/?bwscid1=2">Next &raquo;</a></p>
 `
 
+
+
+
+ 
+
+
 */
+
+
+function oika_oik_ajax_do_shortcode() {
+	bw_trace2();
+	do_action( "oik_add_shortcodes" );
+	//bw_trace2( $_REQUEST, "_REQUEST" );
+	$shortcode = urldecode( bw_array_get( $_REQUEST, "shortcode", null ) );
+	$link = bw_array_get( $_REQUEST, "link", null );
+	$bwscid = bw_array_get( $_REQUEST, "bwscid", null );
+	bw_trace2( $shortcode, "shortcode", false );
+	$shortcode = oika_alter_shortcode( $shortcode, $link, $bwscid );
+	
+	$result = bw_do_shortcode( $shortcode );
+	
+	//$content = bw_array_get( $_REQUEST
+	echo $result;
+	bw_trace2( $result, "result", false );
+	die();
+
+}
+
+/**
+ * Updated the shortcode to reflect the requested page
+ *
+ * Do we need to update the shortcode or can we fiddle it some other way? All we need is the page number of the link
+ * 
+ * `
+C:\apache\htdocs\wordpress\wp-content\plugins\oik-ajax\oik-ajax.php(199:0) oika_oik_ajax_do_shortcode(3) 207 2016-03-02T10:11:30+00:00 0.408477 0.000688 cf=wp_ajax_oik-ajax-do-shortcode 8 0 6486384/6574264 F=331 _REQUEST Array
+(
+    [action] => oik-ajax-do-shortcode
+    [shortcode] => [bw_list+post_type%3D%22oik_pluginversion%2Coik_premiumversion%22+orderby%3D%22date%22+order%3D%22DESC%22+posts_per_page%3D%2210%22+format%3D%22L+de%22+numberposts%3D%2223%22+offset%3D%221%22+class%3D%22w50p2%22+bwscid%3D%221%22+paged%3D%221%22]
+    [post] => 31772
+    [link] => /wordpress/?bwscid1=2
+)`
+ `
+ [bw_list post_type="oik_pluginversion,oik_premiumversion" orderby="date" order="DESC" posts_per_page="10" format="L de" numberposts="23" offset="1" class="w50p2" bwscid="1" paged="1"]
+ `
+ * 
+ * @param string $shortcode shortcode which should contain bwscid=n where n is the shortcode instance starting from 1
+ * @param string $link which should contain bwscidn=p where p is the requested page for this shortcode instance
+ * 
+ */ 
+function oika_alter_shortcode( $shortcode, $link, $bwscid ) {
+	$page = oika_get_page_from_link( $link, $bwscid );
+	bw_trace2( $page, "page" );
+	$shortcode = "[$shortcode paged=$page]";
+	return( $shortcode );
+}
+
+/**
+ * 
+ */
+function oika_get_page_from_link( $link, $bwscid ) {
+	$parts = wp_parse_url( $link );
+  parse_str( $parts['query'], $query );
+	$page = bw_array_get( $query, "bwscid$bwscid", null );
+	return( $page );
+	
+}
+
+
