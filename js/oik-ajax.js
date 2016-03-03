@@ -7,7 +7,21 @@
 // closure to avoid namespace collision
 (function($) { 
 
-  var wahay = function() {
+  var pageloaded = function( json_result ) {
+    page = json_result.page;
+    link = json_result.link;
+    result = json_result.result
+    //alert( result.page + result.link );
+    // We need to find the div.ajax-shortcode that this data is to replace
+    // a class='page-numbers' href='/wordpress/2016/03/02/page-2/?bwscid1=3'>
+    // we need to find the link that has href=link
+    $parent = $( "a[href='" + link + "']" ).parents( "div.ajax-shortcode" );
+    $parent.html( result );
+
+    $('div.ajax-shortcode a.page-numbers').click( loadpage ); 
+  }
+
+  var loadpage = function() {
     //alert( $this );
     // We need to find the div.ajax-shortcode that this link is part of
     // meanwhile find the href
@@ -24,13 +38,13 @@
           'link': $link,
           'bwscid': bwscid };
     //alert( url  ) ;
-    $.post( url, data );
+    $.post( url, data, pageloaded, 'json');
     
     return( false ); 
   }
 
   $(document).ready( function($) {
-    $('div.ajax-shortcode a.page-numbers').click( wahay ); 
+    $('div.ajax-shortcode a.page-numbers').click( loadpage ); 
   })
 }) (jQuery);
         

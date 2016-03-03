@@ -220,13 +220,25 @@ function oika_oik_ajax_do_shortcode() {
 	$link = bw_array_get( $_REQUEST, "link", null );
 	$bwscid = bw_array_get( $_REQUEST, "bwscid", null );
 	bw_trace2( $shortcode, "shortcode", false );
-	$shortcode = oika_alter_shortcode( $shortcode, $link, $bwscid );
+	//$shortcode = oika_alter_shortcode( $shortcode, $link, $bwscid );
 	
-	$result = bw_do_shortcode( $shortcode );
+  $_SERVER['REQUEST_URI'] = $link;
+	$page = oika_get_page_from_link( $link, $bwscid );
+	
+	$_REQUEST["bwscid$bwscid"] = $page;
+	
+	$result = bw_do_shortcode( "[$shortcode]" );
 	
 	//$content = bw_array_get( $_REQUEST
-	echo $result;
-	bw_trace2( $result, "result", false );
+	//echo $result;
+	$json_response = array( "result" => $result
+												, "page" => $page
+												, "link" => $link
+												);
+					
+	$response = json_encode( $json_response ); 
+	echo $response;
+	bw_trace2( $response, "response", false );
 	die();
 
 }
