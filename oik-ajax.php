@@ -3,7 +3,7 @@
 Plugin Name: oik-ajax
 Plugin URI: http://www.oik-plugins.com/oik-plugins/oik-ajax
 Description: Ajaxify paged shortcodes
-Version: 0.0.0
+Version: 0.0.0-alpha.0314
 Author: bobbingwide
 Author URI: http://www.oik-plugins.com/author/bobbingwide
 License: GPLv2 or later
@@ -29,13 +29,15 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 oik_ajax_loaded();
 
-
 /**
  * Functions to invoke when oik-ajax is loaded
  * 
  * "oik_shortcode_result" is automatically invoked for each shortcode
  * but not necessarily invoked for each paginatable output.
- 
+ * 
+ * Use "oik_navi_result" to enable ajaxified pagination when 
+ * invoking the shortcode function directly. {@see bw_navi}
+ * 
  * If that's required you can invoke the filter yourself.
  * BUT we have to be able to convert whatever's been called into a shortcode
  * OR at least an AJAX/JSON request.
@@ -62,8 +64,6 @@ function oik_ajax_loaded() {
  */
 function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
 	$result = oika_build_ajax_shortcode( $result, $atts, $content, $tag );					 
-	//$result .= $ajax_shortcode;
-	
 	return( $result );
 }
 
@@ -76,14 +76,17 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  * The request should be an AJAX request similar to shortcake
  * passing the shortcode and the context under which the shortcode was invoked
  *
- * We have to remove the following atts
+ * We have to remove the following atts:
  * key   | reason
  * ------ | ------
  * paged | otherwise paging won't work
  * meta_query | oika_flatten_atts() can't handle arrays - it can now
  * 
- * 
- *
+ * @param string $result the original shortcode result
+ * @param array $atts the shortcode parameters
+ * @param string $content shortcode content
+ * @param string $tag the shortcode name
+ * @return shortcode result wrapped in oik-ajax pagination
  */
 function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 	$bwscid = bw_array_get( $atts, 'bwscid', null );    
@@ -162,7 +165,6 @@ function oika_current_post() {
 	}
 	return( $post_id );
 }
-
 
 /**
  * Enqueue the jQuery to hook into the pagination links
@@ -278,7 +280,9 @@ function oika_alter_shortcode( $shortcode, $link, $bwscid ) {
 /**
  * Return the requested page from the link
  * 
- 
+ * @param string $link The requested link
+ * @param integer $bwscid 
+ * @return integer the page number required
  */
 function oika_get_page_from_link( $link, $bwscid ) {
 	$parts = wp_parse_url( $link );
@@ -286,7 +290,6 @@ function oika_get_page_from_link( $link, $bwscid ) {
 	$page = bw_array_get( $query, "bwscid$bwscid", null );
 	bw_trace2( $page, "page", true );
 	return( $page );
-	
 }
 
 
