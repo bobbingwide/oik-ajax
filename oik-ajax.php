@@ -43,6 +43,7 @@ oik_ajax_loaded();
  */
 function oik_ajax_loaded() {
 	add_filter( "oik_shortcode_result", "oika_oik_shortcode_result", 11, 4 );
+	add_filter( "oik_navi_result", "oika_oik_shortcode_result", 11, 4 );
 	add_action( "wp_ajax_oik-ajax-do-shortcode", "oika_oik_ajax_do_shortcode" );
 	add_action( "wp_ajax_nopriv_oik-ajax-do-shortcode", "oika_oik_ajax_do_shortcode" );
 }
@@ -74,6 +75,13 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  * 
  * The request should be an AJAX request similar to shortcake
  * passing the shortcode and the context under which the shortcode was invoked
+ *
+ * We have to remove the following atts
+ * key   | reason
+ * ------ | ------
+ * paged | otherwise paging won't work
+ * meta_query | oika_flatten_atts() can't handle arrays - it can now
+ * 
  * 
  *
  */
@@ -84,6 +92,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 		oika_enqueue_jquery();
 		$ajaxurl = admin_url( "admin-ajax.php" );
 		unset( $atts['paged'] );
+		//unset( $atts['meta_query'] );
 		$flat_atts = oika_flatten_atts( $atts );
 		$kvs = kv( "data-url", "$ajaxurl" );
 		$kvs .= kv( "data-shortcode", "$tag$flat_atts" ); 
@@ -111,7 +120,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
  * Flatten the atts parameter back into shortcode parameters
  *
  * We can't use json_encode since it baulks on objects in the array
- * so let's just do outr own thing
+ * so let's just do our own thing
  */
 function oika_flatten_atts( $atts ) {
 	bw_trace2();
@@ -121,6 +130,9 @@ function oika_flatten_atts( $atts ) {
 			if ( is_object( $value ) ) {
 				// WP_Query contains some interesting stuff - do we need it?
 			} else {
+				if ( is_array( $value ) ) {
+					$value = implode( ",",  $value );
+				}
 				$flat_atts .= kv( $key, $value );
 			}
 		}
@@ -202,16 +214,7 @@ function oika_enqueue_jquery() {
 <a class='page-numbers' href='/wporg/oik_shortcodes/bw_navi/?bwscid1=14'>[14]</a>
 <a class="next page-numbers" href="/wporg/oik_shortcodes/bw_navi/?bwscid1=2">Next &raquo;</a></p>
 `
-
-
-
-
- 
-
-
 */
-
-
 function oika_oik_ajax_do_shortcode() {
 	bw_trace2();
 	do_action( "oik_add_shortcodes" );
@@ -225,7 +228,8 @@ function oika_oik_ajax_do_shortcode() {
   $_SERVER['REQUEST_URI'] = $link;
 	$page = oika_get_page_from_link( $link, $bwscid );
 	
-	$_REQUEST["bwscid$bwscid"] = $page;
+	//$_REQUEST["bwscid$bwscid"] = $page;
+	$_REQUEST["bwscid1"] = $page;
 	
 	$result = bw_do_shortcode( "[$shortcode]" );
 	
@@ -272,12 +276,15 @@ function oika_alter_shortcode( $shortcode, $link, $bwscid ) {
 }
 
 /**
+ * Return the requested page from the link
  * 
+ 
  */
 function oika_get_page_from_link( $link, $bwscid ) {
 	$parts = wp_parse_url( $link );
   parse_str( $parts['query'], $query );
 	$page = bw_array_get( $query, "bwscid$bwscid", null );
+	bw_trace2( $page, "page", true );
 	return( $page );
 	
 }
