@@ -3,7 +3,7 @@
 Plugin Name: oik-ajax
 Plugin URI: http://www.oik-plugins.com/oik-plugins/oik-ajax
 Description: Ajaxify paged shortcodes
-Version: 0.0.0-alpha.0314
+Version: 0.0.0-alpha.0316
 Author: bobbingwide
 Author URI: http://www.oik-plugins.com/author/bobbingwide
 License: GPLv2 or later
@@ -280,7 +280,7 @@ function oika_get_page_from_link( $link, $bwscid ) {
  * 
  * and make it the global post object
  *
- *
+ * @param ID $post_id - the post to be fetched
  */
 function oika_get_post( $post_id ) {
 	$post = get_post( $post_id );
