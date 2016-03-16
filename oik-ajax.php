@@ -181,47 +181,27 @@ function oika_enqueue_jquery() {
 }
 
 
-/*
- * Here is some sample output from the [bw_navi] shortcode
- * we don't know the parameters that were used in the shortcode
- * so can't reproduce the results at will
- * We can tell from the output that we're viewing page 1
- * and we also know the URL where the shortcode was executed
- * What we need in the output first of all, is the context of the shortcode.
+/**
+ * Expand the chosen shortcode in the required context
+ *
+ * Paginated content can be created by a number of different shortcodes.
+ * Smart shortcodes are able to determine what they need to do from the current context.
+ * Normally this involves obtaining post information from the global post object.
+ * We need to load the selected post in order to be able to do this.
+ *
+ * Security checking - can the user view the post? - should continue to be performed
  * 
-
-`
-<p><span class="bw_s2eofn">1 to 15 of 207</span>
-<ol class="bw_list">
-<li><a href="http://qw/wporg/oik_shortcodes/ad/" title="ad &#8211; theme_advertisement">ad &#8211; theme_advertisement</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/api/" title="api &#8211; Link to API definitions">api &#8211; Link to API definitions</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/apiref-display-the-api-reference/" title="apiref &#8211; Display the API Reference">apiref &#8211; Display the API Reference</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/apis/" title="apis &#8211; Link to API definitions">apis &#8211; Link to API definitions</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/archives/" title="archives &#8211; Archive index">archives &#8211; Archive index</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/artisteer/" title="artisteer &#8211; Styled form of Artisteer">artisteer &#8211; Styled form of Artisteer</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/audio-2/" title="audio &#8211; Displays uploaded audio file as an audio player">audio &#8211; Displays uploaded audio file as an audio player</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/audio/" title="audio &#8211; Embed audio files">audio &#8211; Embed audio files</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/bbboing-obfuscate-text-but-leave-it-readable/" title="bbboing &#8211; obfuscate text but leave it readable">bbboing &#8211; obfuscate text but leave it readable</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/bing-2/" title="bing &#8211; Styled form of bing">bing &#8211; Styled form of bing</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/blog_title/" title="blog_title &#8211; blog title (Artisteer theme)">blog_title &#8211; blog title (Artisteer theme)</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/bob-3/" title="bob &#8211; Styled form of bob">bob &#8211; Styled form of bob</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/bong/" title="bong &#8211; Styled form of bong">bong &#8211; Styled form of bong</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/bp/" title="bp &#8211; Styled form of BuddyPress">bp &#8211; Styled form of BuddyPress</a></li>
-<li><a href="http://qw/wporg/oik_shortcodes/bw/" title="bw &#8211; Expand to the logo for Bobbing Wide">bw &#8211; Expand to the logo for Bobbing Wide</a></li>
-</ol>
-<p><span class='page-numbers current'>[1]</span>
-<a class='page-numbers' href='/wporg/oik_shortcodes/bw_navi/?bwscid1=2'>[2]</a>
-<a class='page-numbers' href='/wporg/oik_shortcodes/bw_navi/?bwscid1=3'>[3]</a>
-<span class="page-numbers dots">&hellip;</span>
-<a class='page-numbers' href='/wporg/oik_shortcodes/bw_navi/?bwscid1=14'>[14]</a>
-<a class="next page-numbers" href="/wporg/oik_shortcodes/bw_navi/?bwscid1=2">Next &raquo;</a></p>
-`
-*/
+ */
 function oika_oik_ajax_do_shortcode() {
 	bw_trace2();
 	do_action( "oik_add_shortcodes" );
 	//bw_trace2( $_REQUEST, "_REQUEST" );
 	$shortcode = urldecode( bw_array_get( $_REQUEST, "shortcode", null ) );
+	
+	$post = bw_array_get( $_REQUEST, "post", null ); 
+	
+	oika_get_post( $post );
+	
 	$link = bw_array_get( $_REQUEST, "link", null );
 	$bwscid = bw_array_get( $_REQUEST, "bwscid", null );
 	bw_trace2( $shortcode, "shortcode", false );
@@ -230,6 +210,9 @@ function oika_oik_ajax_do_shortcode() {
   $_SERVER['REQUEST_URI'] = $link;
 	$page = oika_get_page_from_link( $link, $bwscid );
 	
+	// Pretend that the shortcode being paged is the first one in the 'content'
+	// Does this work for shortcodes in widgets?
+	//
 	//$_REQUEST["bwscid$bwscid"] = $page;
 	$_REQUEST["bwscid1"] = $page;
 	
@@ -290,6 +273,18 @@ function oika_get_page_from_link( $link, $bwscid ) {
 	$page = bw_array_get( $query, "bwscid$bwscid", null );
 	bw_trace2( $page, "page", true );
 	return( $page );
+}
+
+/**
+ * Fetch the selected post 
+ * 
+ * and make it the global post object
+ *
+ *
+ */
+function oika_get_post( $post_id ) {
+	$post = get_post( $post_id );
+	bw_global_post( $post );
 }
 
 
