@@ -1,4 +1,5 @@
 # oik-ajax 
+![banner](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-banner-772x250.png)
 * Contributors: bobbingwide
 * Donate link: http://www.oik-plugins.com/oik/oik-donate/
 * Tags: upload, plugin, theme
@@ -11,7 +12,6 @@
 ## Description 
 Ajaxifies the output of paged shortcodes so that more content can be loaded to replace the existing content.
 
-![banner](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-banner-772x250.png)
 
 ![icon](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-icon-256x256.jpg)
 
