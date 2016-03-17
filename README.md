@@ -13,7 +13,7 @@ Ajaxifies the output of paged shortcodes so that more content can be loaded to r
 
 ![banner](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-banner-772x250.png)
 
-![icon](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-icon-772x250.png)
+![icon](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-icon-256x256.jpg)
 
 
 
