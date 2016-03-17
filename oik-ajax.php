@@ -48,6 +48,8 @@ function oik_ajax_loaded() {
 	add_filter( "oik_navi_result", "oika_oik_shortcode_result", 11, 4 );
 	add_action( "wp_ajax_oik-ajax-do-shortcode", "oika_oik_ajax_do_shortcode" );
 	add_action( "wp_ajax_nopriv_oik-ajax-do-shortcode", "oika_oik_ajax_do_shortcode" );
+	add_filter( "oik_shortcode_atts", "oika_oik_shortcode_atts", 11, 3 );
+	add_filter( "oik_shortcode_content", "oika_oik_shortcode_content", 10, 3 );
 }
 
 /**
@@ -82,6 +84,7 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  * paged | otherwise paging won't work
  * meta_query | oika_flatten_atts() can't handle arrays - it can now
  * 
+ * 
  * @param string $result the original shortcode result
  * @param array $atts the shortcode parameters
  * @param string $content shortcode content
@@ -89,12 +92,18 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  * @return shortcode result wrapped in oik-ajax pagination
  */
 function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
+  // @TODO Remove temporary code that prevents ajaxification for shortcodes with content
+	if ( $content ) {
+		//return( $result );
+	}
 	$bwscid = bw_array_get( $atts, 'bwscid', null );    
 	$paged = bw_array_get( $atts, "paged", null );
 	if ( $bwscid ) {
 		oika_enqueue_jquery();
 		$ajaxurl = admin_url( "admin-ajax.php" );
 		unset( $atts['paged'] );
+		$content0 = bw_array_get( $atts, "content0", null );
+		unset( $atts['content0'] );
 		//unset( $atts['meta_query'] );
 		$flat_atts = oika_flatten_atts( $atts );
 		$kvs = kv( "data-url", "$ajaxurl" );
@@ -103,6 +112,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 		$kvs .= kv( "data-post", oika_current_post() );
 		$kvs .= kv( "data-bwscid", $bwscid );
 		$kvs .= kv( "data-paged", $paged );
+		$kvs .= kv( "data-content0", $content0 );
 		sdiv( "ajax-shortcode", null, $kvs);
 		//e( "[$tag$flat_atts]" );
 		//e( $current_post ); 
@@ -198,9 +208,9 @@ function oika_oik_ajax_do_shortcode() {
 	//bw_trace2( $_REQUEST, "_REQUEST" );
 	$shortcode = urldecode( bw_array_get( $_REQUEST, "shortcode", null ) );
 	
-	$post = bw_array_get( $_REQUEST, "post", null ); 
+	$post_id = bw_array_get( $_REQUEST, "post", null ); 
 	
-	oika_get_post( $post );
+	$post = oika_get_post( $post_id );
 	
 	$link = bw_array_get( $_REQUEST, "link", null );
 	$bwscid = bw_array_get( $_REQUEST, "bwscid", null );
@@ -216,7 +226,15 @@ function oika_oik_ajax_do_shortcode() {
 	//$_REQUEST["bwscid$bwscid"] = $page;
 	$_REQUEST["bwscid1"] = $page;
 	
-	$result = bw_do_shortcode( "[$shortcode]" );
+	$content0 = bw_array_get( $_REQUEST, "content0", null );
+	if ( $content0 ) {
+		$shortcode_content = oika_fetch_shortcode_content( $post, $shortcode, $content0 );
+		
+		$result = bw_do_shortcode( $shortcode_content );	 // bw_do_shortcode( "[$shortcode]$content[/$shortcode]" );   
+	
+	} else { 
+		$result = bw_do_shortcode( "[$shortcode]" );
+	}
 	
 	//$content = bw_array_get( $_REQUEST
 	//echo $result;
@@ -285,6 +303,111 @@ function oika_get_page_from_link( $link, $bwscid ) {
 function oika_get_post( $post_id ) {
 	$post = get_post( $post_id );
 	bw_global_post( $post );
+	return( $post );
+}
+ 
+/**
+ * Implement "oik_shortcode_content" to pre-paginate the shortcode content
+ *
+ * We should have already worked out the pagination with the following values set.
+ * [posts_per_page] => 3
+ * [bwscid] => 1  
+ * [paged] => 1
+ *
+ * To make the pagination logic work we need to fiddle bw_query to look like we've actually done some SQL.
+ * We also need to indicate to the front-end that the pagination is content based.
+ * @TODO find a way to cater for start and end tags. e.g. for lists or tables
+ * 
+ * @param string $content content to be paginated
+ * @param array $atts shortcode attributes 
+ * @param string $tag the shortcode
+ * @return string that part of the content to be processed
+ */										 
+function oika_oik_shortcode_content( $content, $atts, $tag ) {
+	if ( $content ) {	
+		$content = trim( $content );
+		$content_array = explode( "\n", $content );
+		$start = 0;
+		$posts_per_page = bw_array_get( $atts, "posts_per_page", null );
+		if ( $posts_per_page ) {
+			$page = bw_array_get( $atts, "paged", 1 );
+			if ( $page > 1 ) {
+				$start = ( $page-1 ) * $posts_per_page;
+			}
+			//$end = $start + $posts_per_page;
+			$count = count( $content_array );
+			bw_trace2( $content_array, "content_array" );
+      //$end = min( $start + $posts_per_page, $count ) -1 ;
+			$content_array = array_slice( $content_array, $start, $posts_per_page );
+			$content = implode( "\n", $content_array );
+		}
+	}
+	return( $content );
+}
+
+/**
+ * Implement "oik_shortcode_atts" for oik-ajax
+ *
+ * @param array $atts shortcode attributes
+ * @param string $content 
+ * @param string $tag
+ * @return array updated shortcode atts
+ */ 
+function oika_oik_shortcode_atts( $atts, $content, $tag ) {
+
+	if ( $content ) {	
+		$content = trim( $content );
+		$content_array = explode( "\n", $content );
+		$start = 0;
+		$posts_per_page = bw_array_get( $atts, "posts_per_page", null );
+		if ( $posts_per_page ) {
+			$page = bw_array_get( $atts, "paged", 1 );
+			if ( $page > 1 ) {
+				$start = ( $page-1 ) * $posts_per_page;
+			}
+			//$end = $start + $posts_per_page;
+			$count = count( $content_array );
+			$atts['bw_query']->found_posts = $count;
+			$atts['bw_query']->max_num_pages = ceil( $count / $posts_per_page );
+			$atts['content0'] = $content_array[0];
+		}
+	}
+	return( $atts );
+}
+
+/**
+ * Locate the shortcode content from the post
+ *
+ * bw_do_shortcode( "[$shortcode]$content[/$shortcode]" );
+ *
+ * @param object $post
+ * @param string $shortcode
+ * @param string $content0
+ *
+ */
+function oika_fetch_shortcode_content( $post, $shortcode, $content0 ) {
+	bw_trace2();
+	$result = $post->post_content;
+	$result .= $shortcode;
+	$pos = strpos( $post->post_content, $shortcode );
+	$result .= $pos;
+	$content0 = trim( $content0 );
+	$pos = strpos( $post->post_content, $content0 );
+	$result .= $pos;
+	
+	$code_words = explode(" ", $shortcode );
+	$code = $code_words[0];
+	$len = strpos( $post->post_content, "[/$code]" );
+	$len -= $pos;
+	if ( $pos && $len ) {
+		$result = "[$shortcode]";
+		$result .= substr( $post->post_content, $pos, $len );
+		$result .= "[/$code]";
+	} 
+	 
+	 return( $result );
+
+
 }
 
 

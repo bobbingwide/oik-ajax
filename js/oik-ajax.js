@@ -32,11 +32,13 @@
     shortcode = $parent.data( "shortcode" );
     post = $parent.data( "post" );
     bwscid = $parent.data( "bwscid" );
+    content0 = $parent.data( "content0" );
     data = { 'action': 'oik-ajax-do-shortcode',
           'shortcode': shortcode,
           'post': post,
           'link': $link,
-          'bwscid': bwscid };
+          'bwscid': bwscid, 
+          'content0': content0 };
     //alert( url  ) ;
     $.post( url, data, pageloaded, 'json');
     
