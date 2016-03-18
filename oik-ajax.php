@@ -82,7 +82,7 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  * key   | reason
  * ------ | ------
  * paged | otherwise paging won't work
- * meta_query | oika_flatten_atts() can't handle arrays - it can now
+ * meta_query | oika_flatten_atts() can't handle complex arrays
  * 
  * 
  * @param string $result the original shortcode result
@@ -104,7 +104,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 		unset( $atts['paged'] );
 		$content0 = bw_array_get( $atts, "content0", null );
 		unset( $atts['content0'] );
-		//unset( $atts['meta_query'] );
+		unset( $atts['meta_query'] );
 		$flat_atts = oika_flatten_atts( $atts );
 		$kvs = kv( "data-url", "$ajaxurl" );
 		$kvs .= kv( "data-shortcode", "$tag$flat_atts" ); 
@@ -145,6 +145,7 @@ function oika_flatten_atts( $atts ) {
 			} else {
 				if ( is_array( $value ) ) {
 					$value = implode( ",",  $value );
+					
 				}
 				$flat_atts .= kv( $key, $value );
 			}
@@ -379,21 +380,31 @@ function oika_oik_shortcode_atts( $atts, $content, $tag ) {
  * Locate the shortcode content from the post
  *
  * bw_do_shortcode( "[$shortcode]$content[/$shortcode]" );
+ * 
+ * We attempt to use the value of content0 to locate the shortcode in the post. 
+ * We believe that the end of the shortcode cannot be part of the content, 
+ * as this would confuse WordPress.
+ *
+ * @TODO Caveat: Things can go awry if there are two identical shortcodes with the same first line
+ * Perhaps we need some sort of CRC check to confirm what we have found is what we were looking for.
+ * 
  *
  * @param object $post
  * @param string $shortcode
  * @param string $content0
- *
+ * @return string the shortcode we want to expand
  */
 function oika_fetch_shortcode_content( $post, $shortcode, $content0 ) {
 	bw_trace2();
-	$result = $post->post_content;
-	$result .= $shortcode;
+	//$result = $post->post_content;
+	//$result .= $shortcode;
 	$pos = strpos( $post->post_content, $shortcode );
-	$result .= $pos;
+	//$result .= $pos;
 	$content0 = trim( $content0 );
+	$content0 = stripslashes( $content0 );
+	
 	$pos = strpos( $post->post_content, $content0 );
-	$result .= $pos;
+	//$result .= $pos;
 	
 	$code_words = explode(" ", $shortcode );
 	$code = $code_words[0];
@@ -403,9 +414,13 @@ function oika_fetch_shortcode_content( $post, $shortcode, $content0 ) {
 		$result = "[$shortcode]";
 		$result .= substr( $post->post_content, $pos, $len );
 		$result .= "[/$code]";
-	} 
+	} else {
+		$result = "Logic error in oika_fetch_shortcode_content" ;
+	}
 	 
-	 return( $result );
+	bw_trace2( $result, "RESULT!", false);
+	 
+	return( $result );
 
 
 }
