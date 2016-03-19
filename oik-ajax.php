@@ -99,6 +99,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 	$bwscid = bw_array_get( $atts, 'bwscid', null );    
 	$paged = bw_array_get( $atts, "paged", null );
 	if ( $bwscid ) {
+		bw_push();
 		oika_enqueue_jquery();
 		$ajaxurl = admin_url( "admin-ajax.php" );
 		unset( $atts['paged'] );
@@ -120,7 +121,8 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 	
 		ediv();
 	
-		$ajax_shortcode = bw_ret() ;
+		$ajax_shortcode = bw_ret();
+		bw_pop();
 	} else {	
 		$ajax_shortcode = $result;
 	} 
