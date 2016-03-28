@@ -34,12 +34,14 @@
     post = $parent.data( "post" );
     bwscid = $parent.data( "bwscid" );
     content0 = $parent.data( "content0" );
+    meta_query = $parent.data( "meta_query" );
     data = { 'action': 'oik-ajax-do-shortcode',
           'shortcode': shortcode,
           'post': post,
           'link': $link,
           'bwscid': bwscid, 
-          'content0': content0 };
+          'content0': content0,
+          'meta_query': meta_query };
     //alert( url  ) ;
     $.post( url, data, pageloaded, 'json');
     
