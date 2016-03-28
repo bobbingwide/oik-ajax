@@ -82,7 +82,7 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  * key   | reason
  * ------ | ------
  * paged | otherwise paging won't work
- * meta_query | oika_flatten_atts() can't handle complex arrays
+ * meta_query | oika_flatten_atts() can't handle complex arrays and do_shortcode is not good with serialized parameters
  * 
  * 
  * @param string $result the original shortcode result
@@ -105,6 +105,11 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 		unset( $atts['paged'] );
 		$content0 = bw_array_get( $atts, "content0", null );
 		unset( $atts['content0'] );
+		$meta_query = bw_array_get( $atts, "meta_query", null );
+		if ( $meta_query ) {
+			$meta_query = serialize( $meta_query );
+			$meta_query = urlencode( $meta_query );
+		}
 		unset( $atts['meta_query'] );
 		$flat_atts = oika_flatten_atts( $atts );
 		$kvs = kv( "data-url", "$ajaxurl" );
@@ -114,6 +119,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 		$kvs .= kv( "data-bwscid", $bwscid );
 		$kvs .= kv( "data-paged", $paged );
 		$kvs .= kv( "data-content0", $content0 );
+		$kvs .= kv( "data-meta_query", $meta_query );
 		sdiv( "ajax-shortcode", null, $kvs);
 		//e( "[$tag$flat_atts]" );
 		//e( $current_post ); 
@@ -147,7 +153,6 @@ function oika_flatten_atts( $atts ) {
 			} else {
 				if ( is_array( $value ) ) {
 					$value = implode( ",",  $value );
-					
 				}
 				$flat_atts .= kv( $key, $value );
 			}
@@ -217,6 +222,7 @@ function oika_oik_ajax_do_shortcode() {
 	
 	$link = bw_array_get( $_REQUEST, "link", null );
 	$bwscid = bw_array_get( $_REQUEST, "bwscid", null );
+	
 	bw_trace2( $shortcode, "shortcode", false );
 	//$shortcode = oika_alter_shortcode( $shortcode, $link, $bwscid );
 	
@@ -351,13 +357,15 @@ function oika_oik_shortcode_content( $content, $atts, $tag ) {
 /**
  * Implement "oik_shortcode_atts" for oik-ajax
  *
+ * If the shortcode has nested content we need to choose the right page to be processed
+ * If the pseudo-shortcode used meta_query we need to re-apply this; it's far too fiddly to attempt to pass a meta_query shortcode parameter
+ *
  * @param array $atts shortcode attributes
  * @param string $content 
  * @param string $tag
  * @return array updated shortcode atts
  */ 
 function oika_oik_shortcode_atts( $atts, $content, $tag ) {
-
 	if ( $content ) {	
 		$content = trim( $content );
 		$content_array = explode( "\n", $content );
@@ -374,6 +382,13 @@ function oika_oik_shortcode_atts( $atts, $content, $tag ) {
 			$atts['bw_query']->max_num_pages = ceil( $count / $posts_per_page );
 			$atts['content0'] = $content_array[0];
 		}
+	}
+	$meta_query = bw_array_get( $_REQUEST, "meta_query", null );
+	if ( $meta_query ) {
+		$meta_query = urldecode( $meta_query );
+		$meta_query = unserialize( $meta_query );
+		bw_trace2( $meta_query, "meta_query", false, BW_TRACE_VERBOSE );
+		$atts['meta_query'] = $meta_query;
 	}
 	return( $atts );
 }
