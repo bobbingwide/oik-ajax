@@ -3,7 +3,7 @@
 Plugin Name: oik-ajax
 Plugin URI: http://www.oik-plugins.com/oik-plugins/oik-ajax
 Description: Ajaxify paged shortcodes
-Version: 0.0.0-alpha.0316
+Version: 0.0.0-alpha.0407
 Author: bobbingwide
 Author URI: http://www.oik-plugins.com/author/bobbingwide
 License: GPLv2 or later
