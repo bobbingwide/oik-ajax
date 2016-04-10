@@ -3,7 +3,7 @@ Contributors: bobbingwide
 Donate link: http://www.oik-plugins.com/oik/oik-donate/
 Tags: upload, plugin, theme
 Requires at least: 4.4
-Tested up to: 4.5-RC1
+Tested up to: 4.5-RC2
 Stable tag: 0.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -38,6 +38,9 @@ In order to achieve this it needs some additional information that is passed bac
 3. 
 
 == Upgrade Notice ==
+= 0.0.0-alpha.0407 =
+For testing on herbmiller.me and bobbingwide.org.uk 
+
 = 0.0.0-alpha.0328 =
 Supports ajaxified pagination of code using meta_query in the get posts query
 
@@ -47,7 +50,10 @@ Now fetches the required post for context
 = 0.0.0-alpha.0314 =
 New plugin, also available from GitHub and oik-plugins.
 
-== Changelog == 
+== Changelog ==
+= 0.0.0-alpha.0407 =
+Tested: With WordPress 4.5-RC1
+
 = 0.0.0-alpha.0328 =
 Added: Support ajaxified pagination of shortcode / queries with meta_query in $atts [github bobbingwide oik-ajax issue 4]
 Added: Scroll to start of a new page on update [github bobbingwide oik-ajax issue 3]
