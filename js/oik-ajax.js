@@ -17,7 +17,7 @@
     // we need to find the link that has href=link
     $parent = $( "a[href='" + link + "']" ).parents( "div.ajax-shortcode" );
     //$parent.html( result );
-    $('html, body').animate( { scrollTop: $parent.offset().top }, 500 );
+    $('html, body').animate( { scrollTop: $parent.offset().top - 32 }, 500 );
     $parent.replaceWith( result );
     $('div.ajax-shortcode a.page-numbers').click( loadpage ); 
   }
