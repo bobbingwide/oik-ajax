@@ -144,7 +144,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
  * so let's just do our own thing
  */
 function oika_flatten_atts( $atts ) {
-	bw_trace2();
+	bw_trace2( null, null, true, BW_TRACE_VERBOSE );
 	$flat_atts = "";
 	if ( is_array( $atts) && count( $atts ) ) {
 		foreach ( $atts as $key => $value ) {
