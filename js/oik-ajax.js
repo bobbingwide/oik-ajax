@@ -17,7 +17,13 @@
     // we need to find the link that has href=link
     $parent = $( "a[href='" + link + "']" ).parents( "div.ajax-shortcode" );
     //$parent.html( result );
-    $('html, body').animate( { scrollTop: $parent.offset().top - 32 }, 500 );
+    admin_bar = $( '#wpadminbar' );
+    if ( admin_bar.length ) {
+      admin_bar_height = admin_bar.height();
+    } else {
+      admin_bar_height = 0;
+    }
+    $('html, body').animate( { scrollTop: $parent.offset().top - admin_bar_height }, 500 );
     $parent.replaceWith( result );
     $('div.ajax-shortcode a.page-numbers').click( loadpage ); 
   }
