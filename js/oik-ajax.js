@@ -17,12 +17,7 @@
     // we need to find the link that has href=link
     $parent = $( "a[href='" + link + "']" ).parents( "div.ajax-shortcode" );
     //$parent.html( result );
-    admin_bar = $( '#wpadminbar' );
-    if ( admin_bar.length ) {
-      admin_bar_height = admin_bar.height();
-    } else {
-      admin_bar_height = 0;
-    }
+    admin_bar_height = barheight();
     $('html, body').animate( { scrollTop: $parent.offset().top - admin_bar_height }, 500 );
     $parent.replaceWith( result );
     $('div.ajax-shortcode a.page-numbers').click( loadpage ); 
@@ -52,6 +47,24 @@
     $.post( url, data, pageloaded, 'json');
     
     return( false ); 
+  }
+
+  /**
+   * Take the top bar height into account
+   *
+   * For the WordPress admin bar we just need the height
+   * For the TwentyFourteen theme we need to add the #wpadminbar height as well
+   * TwentyFourteen's CSS allows for it by setting top: 32 in certain situations
+   */
+  var barheight = function() {
+    admin_bar = $( '#wpadminbar, #masthead' );
+    if ( admin_bar.length ) {
+      admin_bar_height = admin_bar.height();
+      admin_bar_height += admin_bar.prop( "offsetTop" );
+    } else {
+      admin_bar_height = 0;
+    }
+    return( admin_bar_height );
   }
 
   $(document).ready( function($) {
