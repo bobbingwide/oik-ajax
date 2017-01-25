@@ -1,9 +1,10 @@
 # oik-ajax 
+![banner](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-banner-772x250.jpg)
 * Contributors: bobbingwide
 * Donate link: http://www.oik-plugins.com/oik/oik-donate/
 * Tags: upload, plugin, theme
 * Requires at least: 4.4
-* Tested up to: 4.5-RC2
+* Tested up to: 4.7.1
 * Stable tag: 0.0.0
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -38,6 +39,9 @@ In order to achieve this it needs some additional information that is passed bac
 3.
 
 ## Upgrade Notice 
+# 0.0.1 
+Formal release. Tested with WordPress 4.7.1
+
 # 0.0.0-alpha.0407 
 For testing on herbmiller.me and bobbingwide.org.uk
 
@@ -51,14 +55,18 @@ Now fetches the required post for context
 New plugin, also available from GitHub and oik-plugins.
 
 ## Changelog 
+# 0.0.1 
+* Changed: banner image
+* Tested: With WordPress 4.7.1 and WordPress Multisite
+
 # 0.0.0-alpha.0407 
 * Tested: With WordPress 4.5-RC1
 
 # 0.0.0-alpha.0328 
-* Added: Support ajaxified pagination of shortcode / queries with meta_query in $atts [github bobbingwide oik-ajax issue 4]
-* Added: Scroll to start of a new page on update [github bobbingwide oik-ajax issue 3]
+* Added: Support ajaxified pagination of shortcode / queries with meta_query in $atts https://github.com/bobbingwide/oik-ajax/issues/4
+* Added: Scroll to start of a new page on update https://github.com/bobbingwide/oik-ajax/issues/3
 * Fixed: Need to push and pop to only wrap the current section
-* Added: Support pagination of shortcodes with nested content [github bobbingwide oik-ajax issue 1]
+* Added: Support pagination of shortcodes with nested content https://github.com/bobbingwide/oik-ajax/issues/1
 
 # 0.0.0-alpha.0316
 * Added: oika_get_post() fetches the selected post before running the shortcode

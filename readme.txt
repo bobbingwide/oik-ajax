@@ -3,7 +3,7 @@ Contributors: bobbingwide
 Donate link: http://www.oik-plugins.com/oik/oik-donate/
 Tags: upload, plugin, theme
 Requires at least: 4.4
-Tested up to: 4.5-RC2
+Tested up to: 4.7.1
 Stable tag: 0.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -38,6 +38,9 @@ In order to achieve this it needs some additional information that is passed bac
 3. 
 
 == Upgrade Notice ==
+= 0.0.1 =
+Formal release. Tested with WordPress 4.7.1 
+
 = 0.0.0-alpha.0407 =
 For testing on herbmiller.me and bobbingwide.org.uk 
 
@@ -51,6 +54,10 @@ Now fetches the required post for context
 New plugin, also available from GitHub and oik-plugins.
 
 == Changelog ==
+= 0.0.1 = 
+* Changed: banner image
+* Tested: With WordPress 4.7.1 and WordPress Multisite
+
 = 0.0.0-alpha.0407 =
 Tested: With WordPress 4.5-RC1
 

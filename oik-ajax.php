@@ -3,13 +3,13 @@
 Plugin Name: oik-ajax
 Plugin URI: http://www.oik-plugins.com/oik-plugins/oik-ajax
 Description: Ajaxify paged shortcodes
-Version: 0.0.0-alpha.0407
+Version: 0.0.1
 Author: bobbingwide
 Author URI: http://www.oik-plugins.com/author/bobbingwide
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-    Copyright 2016 Bobbing Wide (email : herb@bobbingwide.com )
+    Copyright 2016,2017 Bobbing Wide (email : herb@bobbingwide.com )
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 2,
@@ -79,6 +79,7 @@ function oika_oik_shortcode_result( $result, $atts, $content, $tag ) {
  * passing the shortcode and the context under which the shortcode was invoked
  *
  * We have to remove the following atts:
+ * 
  * key   | reason
  * ------ | ------
  * paged | otherwise paging won't work
