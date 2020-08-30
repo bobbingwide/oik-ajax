@@ -1,4 +1,4 @@
-/** (C) Copyright Bobbing Wide 2016
+/** (C) Copyright Bobbing Wide 2016-2020
  *
  * jQuery to initiate AJAX requests to perform pagination
  * 
@@ -68,7 +68,7 @@
   }
 
   $(document).ready( function($) {
-    $('div.ajax-shortcode a.page-numbers').click( loadpage ); 
+    $('div.ajax-shortcode a.page-numbers').on( 'click', loadpage );
   })
 }) (jQuery);
         
