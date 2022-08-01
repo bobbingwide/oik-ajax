@@ -1,11 +1,11 @@
 # oik-ajax 
-![banner](https://raw.githubusercontent.com/bobbingwide/oik-ajax/master/assets/oik-ajax-banner-772x250.jpg)
+![banner](assets/oik-ajax-banner-772x250.jpg)
 * Contributors: bobbingwide
 * Donate link: http://www.oik-plugins.com/oik/oik-donate/
 * Tags: upload, plugin, theme
 * Requires at least: 4.4
-* Tested up to: 5.5.1
-* Stable tag: 0.1.0
+* Tested up to: 6.0.1
+* Stable tag: 0.2.0
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,9 @@ In order to achieve this it needs some additional information that is passed bac
 3.
 
 ## Upgrade Notice 
+# 0.2.0 
+Update for a fix for WordPress Multi Site
+
 # 0.1.0 
 Update for compatibility with jQuery 3.5.1 - planned for WordPress 5.6.0
 
@@ -58,6 +61,11 @@ Now fetches the required post for context
 New plugin, also available from GitHub and oik-plugins.
 
 ## Changelog 
+# 0.2.0 
+* Fixed: Add oikai_get_ajaxurl() for use when blog switched,https://github.com/bobbingwide/oik-ajax/issues/5
+* Tested: With WordPress 6.0.1 and WordPress Multi Site
+* Tested: With PHP 8.0
+
 # 0.1.0 
 * Fixed: Avoid deprecated messages with jQuery 3.5.1,https://github.com/bobbingwide/oik-ajax/issues/7
 * Tested: With WordPress 5.5.1
@@ -81,5 +89,3 @@ New plugin, also available from GitHub and oik-plugins.
 
 # 0.0.0-alpha.0314 
 * Added: New plugin - to improve the end user experience of WP-a2z.com and oik-plugins.com
-
-
