@@ -102,7 +102,7 @@ function oika_build_ajax_shortcode( $result, $atts, $content, $tag ) {
 	if ( $bwscid ) {
 		bw_push();
 		oika_enqueue_jquery();
-		$ajaxurl = admin_url( "admin-ajax.php" );
+		$ajaxurl = oikai_get_ajaxurl();
 		unset( $atts['paged'] );
 		$content0 = bw_array_get( $atts, "content0", null );
 		unset( $atts['content0'] );
@@ -443,4 +443,24 @@ function oika_fetch_shortcode_content( $post, $shortcode, $content0 ) {
 
 }
 
-
+/**
+ * Obtains the correct AJAX URL for WordPress Multi Site.
+ *
+ * In a WordPress Multi Site environment AJAX requests need to be sent to the original page.
+ * If the current blog has been switched then an AJAX request sent to the new blog will be
+ * rejected with a CORS request. Additionally, the post will not be found, so the shortcode will fail.
+ *
+ * This logic detects that the blog's been switched and returns the original blog ID, the first entry in the _wp_switched_stack global.
+ *
+ * @return string|void
+ */
+function oikai_get_ajaxurl() {
+    //print_r( $GLOBALS['switched']);
+    //print_r( $GLOBALS['_wp_switched_stack'] );
+    if ( $GLOBALS['switched'] ) {
+        $ajaxurl = get_admin_url( $GLOBALS['_wp_switched_stack'][0], "admin-ajax.php" );
+    } else {
+        $ajaxurl = admin_url("admin-ajax.php");
+    }
+    return $ajaxurl;
+}
