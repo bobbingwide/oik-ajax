@@ -457,7 +457,7 @@ function oika_fetch_shortcode_content( $post, $shortcode, $content0 ) {
 function oikai_get_ajaxurl() {
     //print_r( $GLOBALS['switched']);
     //print_r( $GLOBALS['_wp_switched_stack'] );
-    if ( $GLOBALS['switched'] ) {
+    if ( isset( $GLOBALS['switched'] ) && $GLOBALS['switched'] ) {
         $ajaxurl = get_admin_url( $GLOBALS['_wp_switched_stack'][0], "admin-ajax.php" );
     } else {
         $ajaxurl = admin_url("admin-ajax.php");
