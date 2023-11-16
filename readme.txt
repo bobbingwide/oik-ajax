@@ -3,8 +3,8 @@ Contributors: bobbingwide
 Donate link: http://www.oik-plugins.com/oik/oik-donate/
 Tags: upload, plugin, theme
 Requires at least: 4.4
-Tested up to: 6.0.1
-Stable tag: 0.2.0
+Tested up to: 6.4.1
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,9 @@ In order to achieve this it needs some additional information that is passed bac
 3. 
 
 == Upgrade Notice ==
+= 0.2.1 =
+Update for support for PHP 8.1 and PHP 8.2
+
 = 0.2.0 =
 Update for a fix for WordPress Multi Site
 
@@ -60,6 +63,12 @@ Now fetches the required post for context
 New plugin, also available from GitHub and oik-plugins.
 
 == Changelog ==
+= 0.2.1 =
+* Changed: PHPUnit test with PHP 8.1 and PHP 8.2
+* Tested: With WordPress 6.4.1 and WordPress Multisite
+* Tested: With PHP 8.1 and PHP 8.2
+* Tested: With PHPUnit 9.6
+
 = 0.2.0 = 
 * Fixed: Add oikai_get_ajaxurl() for use when blog switched,[github bobbingwide oik-ajax issues 5]
 * Tested: With WordPress 6.0.1 and WordPress Multi Site
